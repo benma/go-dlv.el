@@ -37,17 +37,18 @@
 ;; https://github.com/emacs-mirror/emacs/blob/8badbad184c75d6a9b17b72900ca091a1bd11397/lisp/progmodes/gud.el#L1594-1698
 
 (require 'gud)
-;; History of argument lists passed to dlv.
-(defvar gud-dlv-history nil)
 
 ;; Last group is for return value, e.g. "> test.py(2)foo()->None"
 ;; Either file or function name may be omitted: "> <string>(0)?()"
-(defvar gud-dlv-marker-regexp
+(defvar go-dlv-marker-regexp
   "^current loc\\: .+?\\..+? \\(.+\\)\\:\\([0-9]+$\\)")
-(defvar gud-dlv-marker-regexp-file-group 1)
-(defvar gud-dlv-marker-regexp-line-group 2)
+(defvar go-dlv-marker-regexp-file-group 1)
+(defvar go-dlv-marker-regexp-line-group 2)
 
-(defvar gud-dlv-marker-regexp-start "^current loc\: ")
+(defvar go-dlv-marker-regexp-start "^current loc\: ")
+
+(defvar go-dlv-marker-acc "")
+(make-variable-buffer-local 'go-dlv-marker-acc)
 
 ;; There's no guarantee that Emacs will hand the filter the entire
 ;; marker at once; it could be broken up across several strings.  We
@@ -55,54 +56,54 @@
 ;; receive a chunk of text which looks like it might contain the
 ;; beginning of a marker, we save it here between calls to the
 ;; filter.
-(defun gud-dlv-marker-filter (string)
-  (setq gud-marker-acc (concat gud-marker-acc string))
+(defun go-dlv-marker-filter (string)
+  (setq go-dlv-marker-acc (concat go-dlv-marker-acc string))
   (let ((output ""))
 
     ;; Process all the complete markers in this chunk.
-    (while (string-match gud-dlv-marker-regexp gud-marker-acc)
+    (while (string-match go-dlv-marker-regexp go-dlv-marker-acc)
       (setq
 
        ;; Extract the frame position from the marker.
        gud-last-frame
-       (let ((file (match-string gud-dlv-marker-regexp-file-group
-                                 gud-marker-acc))
+       (let ((file (match-string go-dlv-marker-regexp-file-group
+                                 go-dlv-marker-acc))
              (line (string-to-number
-                    (match-string gud-dlv-marker-regexp-line-group
-                                  gud-marker-acc))))
+                    (match-string go-dlv-marker-regexp-line-group
+                                  go-dlv-marker-acc))))
          (cons file line))
 
        ;; Output everything instead of the below
-       output (concat output (substring gud-marker-acc 0 (match-end 0)))
+       output (concat output (substring go-dlv-marker-acc 0 (match-end 0)))
        ;;	  ;; Append any text before the marker to the output we're going
        ;;	  ;; to return - we don't include the marker in this text.
        ;;	  output (concat output
-       ;;		      (substring gud-marker-acc 0 (match-beginning 0)))
+       ;;		      (substring go-dlv-marker-acc 0 (match-beginning 0)))
 
        ;; Set the accumulator to the remaining text.
-       gud-marker-acc (substring gud-marker-acc (match-end 0))))
+       go-dlv-marker-acc (substring go-dlv-marker-acc (match-end 0))))
 
     ;; Does the remaining text look like it might end with the
     ;; beginning of another marker?  If it does, then keep it in
-    ;; gud-marker-acc until we receive the rest of it.  Since we
+    ;; go-dlv-marker-acc until we receive the rest of it.  Since we
     ;; know the full marker regexp above failed, it's pretty simple to
     ;; test for marker starts.
-    (if (string-match gud-dlv-marker-regexp-start gud-marker-acc)
+    (if (string-match go-dlv-marker-regexp-start go-dlv-marker-acc)
         (progn
           ;; Everything before the potential marker start can be output.
-          (setq output (concat output (substring gud-marker-acc
+          (setq output (concat output (substring go-dlv-marker-acc
                                                  0 (match-beginning 0))))
 
           ;; Everything after, we save, to combine with later input.
-          (setq gud-marker-acc
-                (substring gud-marker-acc (match-beginning 0))))
+          (setq go-dlv-marker-acc
+                (substring go-dlv-marker-acc (match-beginning 0))))
 
-      (setq output (concat output gud-marker-acc)
-            gud-marker-acc ""))
+      (setq output (concat output go-dlv-marker-acc)
+            go-dlv-marker-acc ""))
 
     output))
 
-(defcustom gud-dlv-command-name "dlv"
+(defcustom go-dlv-command-name "dlv"
   "File name for executing the Go Delve debugger.
 This should be an executable on your path, or an absolute file name."
   :type 'string
@@ -116,7 +117,7 @@ and source-file directory for your debugger."
   (interactive
    (list (gud-query-cmdline 'dlv "run")))
 
-  (gud-common-init command-line nil 'gud-dlv-marker-filter)
+  (gud-common-init command-line nil 'go-dlv-marker-filter)
   (set (make-local-variable 'gud-minor-mode) 'dlv)
 
   (gud-def gud-break  "break %d%f:%l"  "\C-b" "Set breakpoint at current line.")
@@ -129,7 +130,7 @@ and source-file directory for your debugger."
 
   (setq comint-prompt-regexp "^(Dlv) *")
   (setq paragraph-start comint-prompt-regexp)
-  (run-hooks 'dlv-mode-hook))
+  (run-hooks 'go-dlv-mode-hook))
 
 (provide 'go-dlv)
 
