@@ -41,11 +41,11 @@
 ;; Last group is for return value, e.g. "> test.py(2)foo()->None"
 ;; Either file or function name may be omitted: "> <string>(0)?()"
 (defvar go-dlv-marker-regexp
-  "^current loc\\: .+?\\..+? \\(.+\\)\\:\\([0-9]+$\\)")
+  "^> .+(.*) \\(.+\\)\\:\\([0-9]+\\)$")
 (defvar go-dlv-marker-regexp-file-group 1)
 (defvar go-dlv-marker-regexp-line-group 2)
 
-(defvar go-dlv-marker-regexp-start "^current loc\: ")
+(defvar go-dlv-marker-regexp-start "^> ")
 
 (defvar go-dlv-marker-acc "")
 (make-variable-buffer-local 'go-dlv-marker-acc)
@@ -59,7 +59,6 @@
 (defun go-dlv-marker-filter (string)
   (setq go-dlv-marker-acc (concat go-dlv-marker-acc string))
   (let ((output ""))
-
     ;; Process all the complete markers in this chunk.
     (while (string-match go-dlv-marker-regexp go-dlv-marker-acc)
       (setq
