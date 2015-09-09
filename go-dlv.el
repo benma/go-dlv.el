@@ -125,7 +125,7 @@ and source-file directory for your debugger."
   (gud-def gud-step   "step"         "\C-s" "Step one source line with display.")
   (gud-def gud-next   "next"         "\C-n" "Step one line (skip functions).")
   (gud-def gud-cont   "continue"     "\C-r" "Continue with display.")
-  (gud-def gud-print  "print %e"         "\C-p" "Evaluate Python expression at point.")
+  (gud-def gud-print  "print %e"         "\C-p" "Evaluate Go expression at point.")
 
   (setq comint-prompt-regexp "^(Dlv) *")
   (setq paragraph-start comint-prompt-regexp)
