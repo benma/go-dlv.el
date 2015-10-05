@@ -121,7 +121,7 @@ and source-file directory for your debugger."
 
   (gud-def gud-break  "break %d%f:%l"  "\C-b" "Set breakpoint at current line.")
   (gud-def gud-trace  "trace %d%f:%l"  "\C-t" "Set trace at current line.")
-  (gud-def gud-remove "clear %d%f:%l"  "\C-d" "Remove breakpoint at current line")
+  (gud-def gud-remove "clearall %d%f:%l"  "\C-d" "Remove breakpoint at current line")
   (gud-def gud-step   "step"         "\C-s" "Step one source line with display.")
   (gud-def gud-next   "next"         "\C-n" "Step one line (skip functions).")
   (gud-def gud-cont   "continue"     "\C-r" "Continue with display.")
