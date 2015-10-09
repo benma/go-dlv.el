@@ -114,7 +114,7 @@ This should be an executable on your path, or an absolute file name."
 The directory containing FILE becomes the initial working directory
 and source-file directory for your debugger."
   (interactive
-   (list (gud-query-cmdline 'dlv "run")))
+   (list (gud-query-cmdline 'dlv "debug")))
 
   (gud-common-init command-line nil 'go-dlv-marker-filter)
   (set (make-local-variable 'gud-minor-mode) 'dlv)
