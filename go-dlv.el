@@ -41,7 +41,7 @@
 ;; Sample marker line:
 ;; > main.main() ./test.go:10 (hits goroutine(5):1 total:1)
 (defvar go-dlv-marker-regexp
-  "^> .+(.*) \\(.+\\)\\:\\([0-9]+\\)")
+  "^> .+(.*) \\(.+\\)\\:\\([0-9]+\\) (hits.+)$")
 (defvar go-dlv-marker-regexp-file-group 1)
 (defvar go-dlv-marker-regexp-line-group 2)
 
