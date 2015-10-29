@@ -5,6 +5,7 @@
 ;; Author: Marko Bencun <mbencun@gmail.com>
 ;; URL: https://github.com/benma/go-dlv.el/
 ;; Version: 0.1
+;; Package-Requires: ((go-mode "1.3.1"))
 ;; Keywords: Go, debug, debugger, delve, interactive, gud
 
 ;; This file is part of go-dlv.
@@ -37,6 +38,7 @@
 ;; https://github.com/emacs-mirror/emacs/blob/8badbad184c75d6a9b17b72900ca091a1bd11397/lisp/progmodes/gud.el#L1594-1698
 
 (require 'gud)
+(require 'go-mode)
 
 ;; Sample marker line:
 ;; > main.main() ./test.go:10 (hits goroutine(5):1 total:1)
@@ -130,6 +132,42 @@ and source-file directory for your debugger."
   (setq comint-prompt-regexp "^(Dlv) *")
   (setq paragraph-start comint-prompt-regexp)
   (run-hooks 'go-dlv-mode-hook))
+
+;;;###autoload
+(defun dlv-current-func ()
+  "Debug the current program or test stopping at the beginning of the current function."
+  (interactive)
+  (let (current-test-name current-func-loc)
+    ;; find the location of the current function and (if it is a test function) its name
+    (save-excursion
+      (when (go-beginning-of-defun)
+        (setq current-func-loc (format "%s:%d" buffer-file-name (line-number-at-pos)))
+        ;; if we are looking at the test function populate current-test-name
+        (when (looking-at go-func-regexp)
+          (let ((func-name (match-string 1)))
+            (when (and (string-match-p "_test\.go$" buffer-file-name)
+                       (string-match-p "^Test\\|^Example" func-name))
+              (setq current-test-name func-name))))))
+
+    (if current-func-loc
+        (let (gud-buffer-name dlv-command)
+          (if current-test-name
+              (progn
+                (setq gud-buffer-name "*gud-test*")
+                (setq dlv-command (concat go-dlv-command-name " test -- -test.run " current-test-name)))
+            (progn
+              (setq gud-buffer-name "*gud-debug*")
+              (setq dlv-command (concat go-dlv-command-name " debug"))))
+
+          ;; stop the current active dlv session if any
+          (let ((gud-buffer (get-buffer gud-buffer-name)))
+            (when gud-buffer (kill-buffer gud-buffer)))
+
+          ;; run dlv and stop at the beginning of the current function
+          (dlv dlv-command)
+          (gud-call (format "break %s" current-func-loc))
+          (gud-call "continue"))
+      (error "Not in function"))))
 
 (provide 'go-dlv)
 
