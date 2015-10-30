@@ -25,7 +25,7 @@
 
 ;;; Installation
 
-;; If you are using Emacs 24 or later, you can get go-dlv from [melpa](http://melpa.milkbox.net/) with the package manager.
+;; If you are using Emacs 24 or later, you can get go-dlv from [melpa](https://melpa.org/) with the package manager.
 ;; Add the following code to your init file.
 ;; ----------------------------------------------------------
 ;; (add-to-list 'load-path "folder-in-which-go-dlv-files-are-in/") ;; if the files are not already in the load path
