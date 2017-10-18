@@ -8,6 +8,8 @@
 ;; Package-Requires: ((go-mode "1.3.1"))
 ;; Keywords: Go, debug, debugger, delve, interactive, gud
 
+;;; Commentary:
+
 ;; This file is part of go-dlv.
 
 ;; go-dlv is free software: you can redistribute it and/or modify
@@ -59,6 +61,7 @@
 ;; beginning of a marker, we save it here between calls to the
 ;; filter.
 (defun go-dlv-marker-filter (string)
+  "Filter STRING with text possibly containing one or more whole or partial markers."
   (setq go-dlv-marker-acc (concat go-dlv-marker-acc string))
   (let ((output ""))
     ;; Process all the complete markers in this chunk.
@@ -112,9 +115,9 @@ This should be an executable on your path, or an absolute file name."
 
 ;;;###autoload
 (defun dlv (command-line)
-  "Run dlv on program FILE in buffer `*gud-FILE*'.
-The directory containing FILE becomes the initial working directory
-and source-file directory for your debugger."
+  "Run dlv on the program within COMMAND-LINE in buffer `*gud-FILE*'.
+The directory containing the program in COMMAND-LINE becomes the
+initial working directory and source-file directory for your debugger."
   (interactive
    (list (gud-query-cmdline 'dlv "debug")))
 
