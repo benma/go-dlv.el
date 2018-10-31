@@ -39,18 +39,28 @@
 
 (require 'gud)
 (require 'go-mode)
+(require 'cl-lib)
 
-;; Sample marker line:
+;; Sample marker lines:
+;;
+;; Frame 2: ./main.go:76 (PC: e883c7)
 ;; > main.main() ./test.go:10 (hits goroutine(5):1 total:1)
-(defvar go-dlv-marker-regexp
-  "^> .+(.*) \\(.+\\)\\:\\([0-9]+\\).*?$")
-(defvar go-dlv-marker-regexp-file-group 1)
-(defvar go-dlv-marker-regexp-line-group 2)
+(setq go-dlv-marker-regexps
+  '("^Frame [0-9]+: \\([^:]+\\):\\([0-9]+\\)"
+    "^> .+(.*) \\(.+\\)\\:\\([0-9]+\\)"))
 
-(defvar go-dlv-marker-regexp-start "^> ")
+(defvar go-dlv-marker-regexp-start "^\\(> \\|Frame [0-9]+:\\)")
 
 (defvar go-dlv-marker-acc "")
 (make-variable-buffer-local 'go-dlv-marker-acc)
+
+(defun* go-dlv-extract-file-line (string)
+  "Extract the first frame position found in the string. Returns (filename . line) or nil."
+  (dolist (re go-dlv-marker-regexps)
+    (if (string-match re string)
+        (progn
+          (return-from go-dlv-extract-file-line
+            (cons (match-string 1 string) (string-to-number (match-string 2 string))))))))
 
 ;; There's no guarantee that Emacs will hand the filter the entire
 ;; marker at once; it could be broken up across several strings.  We
@@ -60,20 +70,11 @@
 ;; filter.
 (defun go-dlv-marker-filter (string)
   (setq go-dlv-marker-acc (concat go-dlv-marker-acc string))
-  (let ((output ""))
+  (let ((output "") file-line)
     ;; Process all the complete markers in this chunk.
-    (while (string-match go-dlv-marker-regexp go-dlv-marker-acc)
+    (while (setq file-line (go-dlv-extract-file-line go-dlv-marker-acc))
       (setq
-
-       ;; Extract the frame position from the marker.
-       gud-last-frame
-       (let ((file (match-string go-dlv-marker-regexp-file-group
-                                 go-dlv-marker-acc))
-             (line (string-to-number
-                    (match-string go-dlv-marker-regexp-line-group
-                                  go-dlv-marker-acc))))
-         (cons file line))
-
+       gud-last-frame file-line
        ;; Output everything instead of the below
        output (concat output (substring go-dlv-marker-acc 0 (match-end 0)))
        ;;	  ;; Append any text before the marker to the output we're going
@@ -101,7 +102,6 @@
 
       (setq output (concat output go-dlv-marker-acc)
             go-dlv-marker-acc ""))
-
     output))
 
 (defcustom go-dlv-command-name "dlv"
