@@ -40,10 +40,13 @@
 (require 'gud)
 (require 'go-mode)
 
-;; Sample marker line:
+;; Sample marker lines:
 ;; > main.main() ./test.go:10 (hits goroutine(5):1 total:1)
+;; > [unrecovered-panic] runtime.fatalpanic() /usr/lib/golang/src/runtime/panic.go:681 (hits goroutine(16):1 total:1) (PC: 0x435140)
+;; Frame 2: /usr/lib/golang/src/testing/testing.go:792 (PC: 50fc82)
 (defvar go-dlv-marker-regexp
-  "^> .+(.*) \\(.+\\)\\:\\([0-9]+\\).*?$")
+   "^\\(?:\\(?:> .+?(.*?) \\)\\|\\(?:Frame [0-9]+: \\)\\)\\(.+?\\)\\:\\([0-9]+\\)")
+
 (defvar go-dlv-marker-regexp-file-group 1)
 (defvar go-dlv-marker-regexp-line-group 2)
 
@@ -121,14 +124,16 @@ and source-file directory for your debugger."
   (gud-common-init command-line nil 'go-dlv-marker-filter)
   (set (make-local-variable 'gud-minor-mode) 'dlv)
 
-  (gud-def gud-break  "break %d%f:%l"  "\C-b" "Set breakpoint at current line.")
-  (gud-def gud-trace  "trace %d%f:%l"  "\C-t" "Set trace at current line.")
-  (gud-def gud-remove "clearall %d%f:%l"  "\C-d" "Remove breakpoint at current line")
-  (gud-def gud-step   "step"         "\C-s" "Step one source line with display.")
-  (gud-def gud-finish "stepout"      "\C-f" "Run the program until the selected stack frame returns or stops for some other reason.")
-  (gud-def gud-next   "next"         "\C-n" "Step one line (skip functions).")
-  (gud-def gud-cont   "continue"     "\C-r" "Continue with display.")
+  (gud-def gud-break  "break %d%f:%l"    "\C-b" "Set breakpoint at current line.")
+  (gud-def gud-trace  "trace %d%f:%l"    "\C-t" "Set trace at current line.")
+  (gud-def gud-remove "clearall %d%f:%l" "\C-d" "Remove breakpoint at current line")
+  (gud-def gud-step   "step"             "\C-s" "Step one source line with display.")
+  (gud-def gud-finish "stepout"          "\C-f" "Finish executing current function.")
+  (gud-def gud-next   "next"             "\C-n" "Step one line (skip functions).")
+  (gud-def gud-cont   "continue"         "\C-r" "Continue running program.")
   (gud-def gud-print  "print %e"         "\C-p" "Evaluate Go expression at point.")
+  (gud-def gud-up     "up %p"            "<"    "Up N stack frames (numeric arg).")
+  (gud-def gud-down   "down %p"          ">"    "Down N stack frames (numeric arg).")
 
   (setq comint-prompt-regexp "^(Dlv) *")
   (setq paragraph-start comint-prompt-regexp)
