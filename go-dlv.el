@@ -125,6 +125,7 @@ and source-file directory for your debugger."
   (gud-def gud-trace  "trace %d%f:%l"  "\C-t" "Set trace at current line.")
   (gud-def gud-remove "clearall %d%f:%l"  "\C-d" "Remove breakpoint at current line")
   (gud-def gud-step   "step"         "\C-s" "Step one source line with display.")
+  (gud-def gud-finish "stepout"      "\C-f" "Run the program until the selected stack frame returns or stops for some other reason.")
   (gud-def gud-next   "next"         "\C-n" "Step one line (skip functions).")
   (gud-def gud-cont   "continue"     "\C-r" "Continue with display.")
   (gud-def gud-print  "print %e"         "\C-p" "Evaluate Go expression at point.")
