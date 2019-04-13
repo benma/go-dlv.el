@@ -45,7 +45,7 @@
 ;; > [unrecovered-panic] runtime.fatalpanic() /usr/lib/golang/src/runtime/panic.go:681 (hits goroutine(16):1 total:1) (PC: 0x435140)
 ;; Frame 2: /usr/lib/golang/src/testing/testing.go:792 (PC: 50fc82)
 (defvar go-dlv-marker-regexp
-   "^\\(?:\\(?:> .+?(.*?) \\)\\|\\(?:Frame [0-9]+: \\)\\)\\(.+?\\)\\:\\([0-9]+\\)")
+  "^\\(?:\\(?:> .+?(.*?) \\)\\|\\(?:Frame [0-9]+: \\)\\)\\(.+?\\)\\:\\([0-9]+\\)")
 
 (defvar go-dlv-marker-regexp-file-group 1)
 (defvar go-dlv-marker-regexp-line-group 2)
