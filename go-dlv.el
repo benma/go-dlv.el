@@ -143,27 +143,33 @@ and source-file directory for your debugger."
 (defun dlv-current-func ()
   "Debug the current program or test stopping at the beginning of the current function."
   (interactive)
-  (let (current-test-name current-func-loc)
+  (let (current-test-name current-bench-name current-func-loc)
     ;; find the location of the current function and (if it is a test function) its name
     (save-excursion
       (when (go-beginning-of-defun)
         (setq current-func-loc (format "%s:%d" buffer-file-name (line-number-at-pos)))
-        ;; if we are looking at the test function populate current-test-name
+        ;; Check for Test or Benchmark function, set current-test-name/current-bench-name
         (when (looking-at go-func-regexp)
           (let ((func-name (match-string 1)))
-            (when (and (string-match-p "_test\.go$" buffer-file-name)
-                       (string-match-p "^Test\\|^Example" func-name))
-              (setq current-test-name func-name))))))
+            (when (string-match-p "_test\.go$" buffer-file-name)
+              (cond
+               ((string-match-p "^Test\\|^Example" func-name)
+                (setq current-test-name func-name))
+               ((string-match-p "^Benchmark" func-name)
+                (setq current-bench-name func-name))))))))
 
     (if current-func-loc
         (let (gud-buffer-name dlv-command)
-          (if current-test-name
-              (progn
-                (setq gud-buffer-name "*gud-test*")
-                (setq dlv-command (concat go-dlv-command-name " test -- -test.run " current-test-name)))
-            (progn
-              (setq gud-buffer-name "*gud-debug*")
-              (setq dlv-command (concat go-dlv-command-name " debug"))))
+          (cond
+           (current-test-name
+            (setq gud-buffer-name "*gud-test*")
+            (setq dlv-command (concat go-dlv-command-name " test -- -test.run " current-test-name)))
+           (current-bench-name
+            (setq gud-buffer-name "*gud-test*")
+            (setq dlv-command (concat go-dlv-command-name " test -- -test.run='^$' -test.bench=" current-bench-name)))
+           (t
+            (setq gud-buffer-name "*gud-debug*")
+            (setq dlv-command (concat go-dlv-command-name " debug"))))
 
           ;; stop the current active dlv session if any
           (let ((gud-buffer (get-buffer gud-buffer-name)))
