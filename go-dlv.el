@@ -1,10 +1,10 @@
 ;;; go-dlv.el --- Go Delve - Debug Go programs interactively with the GUD.
 
-;; Copyright (C) 2015 Marko Bencun
+;; Copyright (C) 2015, 2019 Marko Bencun
 
 ;; Author: Marko Bencun <mbencun@gmail.com>
 ;; URL: https://github.com/benma/go-dlv.el/
-;; Version: 0.1
+;; Version: 0.3
 ;; Package-Requires: ((go-mode "1.3.1"))
 ;; Keywords: Go, debug, debugger, delve, interactive, gud
 
