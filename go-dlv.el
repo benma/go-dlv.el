@@ -107,7 +107,10 @@
 
     output))
 
-(defcustom go-dlv-command-name "dlv"
+(define-obsolete-variable-alias 'go-dlv-command-name
+  'gud-dlv-command-name)
+
+(defcustom gud-dlv-command-name "dlv"
   "File name for executing the Go Delve debugger.
 This should be an executable on your path, or an absolute file name."
   :type 'string
@@ -163,13 +166,13 @@ and source-file directory for your debugger."
           (cond
            (current-test-name
             (setq gud-buffer-name "*gud-test*")
-            (setq dlv-command (concat go-dlv-command-name " test -- -test.run " current-test-name)))
+            (setq dlv-command (concat gud-dlv-command-name " test -- -test.run " current-test-name)))
            (current-bench-name
             (setq gud-buffer-name "*gud-test*")
-            (setq dlv-command (concat go-dlv-command-name " test -- -test.run='^$' -test.bench=" current-bench-name)))
+            (setq dlv-command (concat gud-dlv-command-name " test -- -test.run='^$' -test.bench=" current-bench-name)))
            (t
             (setq gud-buffer-name "*gud-debug*")
-            (setq dlv-command (concat go-dlv-command-name " debug"))))
+            (setq dlv-command (concat gud-dlv-command-name " debug"))))
 
           ;; stop the current active dlv session if any
           (let ((gud-buffer (get-buffer gud-buffer-name)))
