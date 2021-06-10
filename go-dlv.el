@@ -107,9 +107,6 @@
 
     output))
 
-(define-obsolete-variable-alias 'go-dlv-command-name
-  'gud-dlv-command-name)
-
 (defcustom gud-dlv-command-name "dlv"
   "File name for executing the Go Delve debugger.
 This should be an executable on your path, or an absolute file name."
