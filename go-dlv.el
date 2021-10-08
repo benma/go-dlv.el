@@ -134,6 +134,7 @@ and source-file directory for your debugger."
   (gud-def gud-finish "stepout"          "\C-f" "Finish executing current function.")
   (gud-def gud-next   "next"             "\C-n" "Step one line (skip functions).")
   (gud-def gud-cont   "continue"         "\C-r" "Continue running program.")
+  (gud-def gud-until  "continue %d%f:%l" "\C-u" "Continue to current line.")
   (gud-def gud-print  "print %e"         "\C-p" "Evaluate Go expression at point.")
   (gud-def gud-up     "up %p"            "<"    "Up N stack frames (numeric arg).")
   (gud-def gud-down   "down %p"          ">"    "Down N stack frames (numeric arg).")
