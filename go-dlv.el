@@ -136,6 +136,7 @@ and source-file directory for your debugger."
   (gud-def gud-cont   "continue"         "\C-r" "Continue running program.")
   (gud-def gud-until  "continue %d%f:%l" "\C-u" "Continue to current line.")
   (gud-def gud-print  "print %e"         "\C-p" "Evaluate Go expression at point.")
+  (gud-def gud-watch  "display -a %e"    "\C-w" "Print expression at point on every step.")
   (gud-def gud-up     "up %p"            "<"    "Up N stack frames (numeric arg).")
   (gud-def gud-down   "down %p"          ">"    "Down N stack frames (numeric arg).")
 
